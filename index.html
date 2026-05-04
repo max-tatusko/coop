@@ -462,10 +462,7 @@
   if (tg) {
     tg.ready();
     tg.expand();
-    tg.MainButton.setText('Написати в Instagram');
-    tg.MainButton.setParams({ color: '#6E8CFF', text_color: '#0E0D0D' });
-    tg.MainButton.show();
-    tg.MainButton.onClick(() => { haptic('medium'); tg.openLink('https://instagram.com/max.tatusko'); });
+tg.MainButton.hide();
   }
 
   function openTelegram() {
