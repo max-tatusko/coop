@@ -33,16 +33,15 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
 
-    body::before {
-      content: '';
+    #noise-canvas {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 200;
-      opacity: 0.55;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 128px 128px;
+      opacity: 0.4;
       mix-blend-mode: overlay;
+      width: 100%;
+      height: 100%;
     }
 
     /* STICKY HEADER */
@@ -127,7 +126,7 @@
 
     /* FORMAT CARDS */
     .formats { display: flex; flex-direction: column; gap: 0; margin-bottom: 56px; }
-    .format-card { border-radius: 0; overflow: hidden; margin-bottom: 0; }
+    .format-card { border-radius: 0; overflow: visible; margin-bottom: 0; }
     .format-header { padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .format-card.blue   .format-header { background: var(--blue-bg); }
     .format-card.green  .format-header { background: var(--green-bg); }
@@ -240,6 +239,7 @@
   <button class="sticky-btn" onclick="openTelegram()">Написати ↗</button>
 </div>
 
+<canvas id="noise-canvas"></canvas>
 <div class="watermark">
   <span>@max.tatusko</span>
   <span>Режисер нових сезонів</span>
@@ -310,7 +310,7 @@
         <div>
           <div class="format-tag">Формат 01 · Синій</div>
           <div class="format-name">Що далі?</div>
-          <div class="format-meta">90 хвилин · Онлайн або офлайн</div>
+          <div class="format-meta">90 хвилин · Онлайн</div>
         </div>
         <div class="format-price">
           <div class="format-price-num">1111 ₴</div>
@@ -338,7 +338,7 @@
         <div>
           <div class="format-tag">Формат 02 · Зелений</div>
           <div class="format-name">Прайм</div>
-          <div class="format-meta">3-4 години · Онлайн або офлайн</div>
+          <div class="format-meta">3-4 години · Онлайн</div>
         </div>
         <div class="format-price">
           <div class="format-price-num">€150</div>
@@ -367,7 +367,7 @@
         <div>
           <div class="format-tag">Формат 03 · Фіолетовий</div>
           <div class="format-name">Стратегія</div>
-          <div class="format-meta">4-5 год + follow-up · Онлайн або офлайн</div>
+          <div class="format-meta">4-5 год + follow-up · Онлайн</div>
         </div>
         <div class="format-price">
           <div class="format-price-num">€450</div>
@@ -483,6 +483,35 @@ tg.MainButton.hide();
   window.addEventListener('scroll', () => {
     stickyHeader.classList.toggle('visible', window.scrollY > 120);
   }, { passive: true });
+
+  // Animated noise
+  const canvas = document.getElementById('noise-canvas');
+  const ctx = canvas.getContext('2d');
+  let frame = 0;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function drawNoise() {
+    const w = canvas.width;
+    const h = canvas.height;
+    const imageData = ctx.createImageData(w, h);
+    const data = imageData.data;
+    const seed = frame * 7919;
+    for (let i = 0; i < data.length; i += 4) {
+      const val = (Math.random() * 255) | 0;
+      data[i] = data[i+1] = data[i+2] = val;
+      data[i+3] = 38;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    frame++;
+    requestAnimationFrame(drawNoise);
+  }
+  drawNoise();
 </script>
 </body>
 </html>
